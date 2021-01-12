@@ -35,11 +35,24 @@ const djsController = {
   },
 
   addDj: async (data) => {
-  
-    const newDj = await Djs.create(data, {
-      through: data.musical_genres
+
+    const newDj = await Djs.create(data);
+
+    const musicalgenres = await Musicalgenres.findOne({
+      where : {
+        name : data.musical_genres[0]
+      }
+    });
+    if (!musicalgenres){
+      throw new NotFoundError("Ressource introuvable","Ce genre de musique n'existe pas")
+    }  
+    await DjMusicalgenres.create({
+      dj_id: newDj.id,
+      musicalgenre_id : musicalgenres.id
     })
-    console.log("------", data.musical_genres);
+    // const newDj = await Djs.create(data, {
+    //   through: data.musical_genres
+    // })
     return {
       newDj
     };
